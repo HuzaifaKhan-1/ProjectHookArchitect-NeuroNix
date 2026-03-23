@@ -401,6 +401,9 @@ function App() {
   const [optStatus, setOptStatus] = useState("");
   const [isOptimized, setIsOptimized] = useState(false);
   
+  const [isDubbing, setIsDubbing] = useState(false);
+  const [targetDubLang, setTargetDubLang] = useState('hi');
+  
   const [audienceSim, setAudienceSim] = useState(null);
   const [runningSim, setRunningSim] = useState(false);
   
@@ -468,6 +471,60 @@ function App() {
       alert(error.message || "Error!");
     } finally {
       setAnalyzing(false);
+    }
+  };
+
+  const handleDubAndAnalyze = async () => {
+    if (!videoFile) return;
+    setAnalyzing(true);
+    setIsDubbing(true);
+    setResults(null);
+    setIsOptimized(false);
+    
+    try {
+      const dubData = new FormData();
+      dubData.append("file", videoFile);
+      dubData.append("target_lang", targetDubLang);
+      
+      const response = await fetch("http://localhost:8000/dub_video", {
+        method: "POST",
+        body: dubData,
+      });
+      
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.detail || "Dubbing Pipeline failed on backend.");
+      }
+      
+      const dubbedBlob = await response.blob();
+      const dubbedUrl = window.URL.createObjectURL(dubbedBlob);
+      
+      const a = document.createElement('a');
+      a.href = dubbedUrl;
+      a.download = `Hook_Architect_Dubbed_${targetDubLang}.mp4`;
+      a.click();
+      
+      const newDubbedFile = new File([dubbedBlob], "Dubbed.mp4", { type: "video/mp4" });
+      setVideoFile(newDubbedFile);
+      setVideoUrl(dubbedUrl);
+      
+      const analyzeData = new FormData();
+      analyzeData.append("file", newDubbedFile);
+      const resAnalysis = await fetch("http://localhost:8000/analyze", {
+        method: "POST", body: analyzeData
+      });
+      
+      if (!resAnalysis.ok) throw new Error("Failed to analyze dubbed video.");
+      const finalData = await resAnalysis.json();
+      finalData.isYoutubeAnalysis = false;
+      setResults(finalData);
+      
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Error during Dubbing Engine run.");
+    } finally {
+      setAnalyzing(false);
+      setIsDubbing(false);
     }
   };
 
@@ -674,7 +731,28 @@ function App() {
                     <button className="primary-btn" onClick={handleAnalyze}>{t.analyzeYtBtn}</button>
                   </div>
                 )}
-                {videoFile && !isYoutube && <button className="primary-btn pulse-glow" style={{ marginTop: '2rem', width: '100%' }} onClick={handleAnalyze}>{t.analyzeBtn}</button>}
+                {videoFile && !isYoutube && (
+                  <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                    <button className="primary-btn pulse-glow" style={{ width: '100%' }} onClick={handleAnalyze}>{t.analyzeBtn}</button>
+                    
+                    <div style={{ display: 'flex', gap: '8px', background: 'rgba(255,255,255,0.03)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                      <select 
+                        value={targetDubLang} 
+                        onChange={(e) => setTargetDubLang(e.target.value)}
+                        style={{ padding: '8px 12px', borderRadius: '8px', background: '#1e293b', color: '#fff', border: '1px solid #475569', flex: 1, outline: 'none' }}
+                      >
+                        <option value="en">English (US)</option>
+                        <option value="hi">Hindi (IN)</option>
+                        <option value="mr">Marathi (IN)</option>
+                        <option value="es">Spanish (ES)</option>
+                        <option value="fr">French (FR)</option>
+                      </select>
+                      <button className="primary-btn" style={{ background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)', flex: 2 }} onClick={handleDubAndAnalyze}>
+                         Dub & Analyze
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </>
@@ -683,12 +761,14 @@ function App() {
         {analyzing &&            <div className="loader-container">
               <div className="spinner"></div>
               <p style={{ marginTop: '20px', fontSize: '1.2rem', fontWeight: 800, background: 'linear-gradient(90deg, #6366f1, #a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', animation: 'pulse-q 1.5s infinite' }}>
-                {t.fetching}
+                {isDubbing ? "Global Multi-Lingual Engine Active..." : t.fetching}
               </p>
               <p style={{ marginTop: '8px', color: '#a855f7', fontSize: '0.9rem', fontWeight: 600 }}>
-                ⚙️ Collapsing Quantum Superposition...
+                {isDubbing ? "⚙️ Translating & Synthesizing Neural Audio..." : "⚙️ Collapsing Quantum Superposition..."}
               </p>
-              <div style={{ marginTop: '15px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t.filtering}</div>
+              <div style={{ marginTop: '15px', color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                {isDubbing ? "This involves Whisper AI & Neural Edge TTS." : t.filtering}
+              </div>
             </div>
         }
 

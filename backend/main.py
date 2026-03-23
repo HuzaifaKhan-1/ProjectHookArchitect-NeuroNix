@@ -2,6 +2,7 @@ import os
 from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+from dubbing_router import dub_router
 import time
 import uuid
 import os
@@ -69,7 +70,7 @@ import numpy as np
 import cv2
 import yt_dlp
 
-app = FastAPI()
+app = FastAPI(title="Hook Architect API v3.0 - Quantum Edition")
 
 app.add_middleware(
     CORSMiddleware,
@@ -78,6 +79,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Integrat full dubbing pipeline API
+app.include_router(dub_router)
 
 @app.get("/")
 def read_root():
