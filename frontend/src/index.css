@@ -10,6 +10,7 @@
   --text-muted: #94a3b8;
   --border-color: rgba(255, 255, 255, 0.08);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.82);
+  color-scheme: dark; /* Forces browser to use dark menus */
 }
 
 * {
@@ -1000,4 +1001,145 @@ body {
   .header {
     top: 10px;
   }
+}
+/* --- High-End Professional UI Overhaul --- */
+
+.upload-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 550px;
+  margin-top: 3rem;
+}
+
+.action-btn-main {
+  width: 100%;
+  padding: 22px;
+  background: var(--accent-primary);
+  color: white;
+  border-radius: 18px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.action-btn-main:hover {
+  transform: translateY(-4px) scale(1.01);
+  background: #4f46e5;
+  box-shadow: 0 20px 40px rgba(99, 102, 241, 0.5);
+}
+
+.feature-island {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  backdrop-filter: blur(12px);
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-island::before {
+  content: 'ADVANCED ENGINE';
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 0.6rem;
+  font-weight: 900;
+  color: var(--accent-primary);
+  opacity: 0.6;
+  letter-spacing: 2px;
+}
+
+.dub-control-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.glass-select-wrapper {
+  flex: 1;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: border-color 0.3s;
+}
+
+.glass-select-wrapper:focus-within {
+  border-color: var(--accent-primary);
+}
+
+.glass-select {
+  background: transparent;
+  border: none;
+  color: white;
+  width: 100%;
+  font-size: 0.95rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+  appearance: none; /* Removes default arrow to prevent glitches */
+  padding-right: 15px;
+}
+
+.glass-select option {
+  background-color: #0f172a !important; /* Force ultra-dark solid background */
+  color: #ffffff !important;           /* Force pure white text */
+  padding: 12px;
+}
+
+.action-btn-special {
+  flex: 1.5;
+  background: white;
+  color: #000;
+  border-radius: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.action-btn-special:hover {
+  background: #f8fafc;
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.2);
+}
+
+.btn-icon-circle {
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.label-micro {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-align: left;
+  display: block;
+  margin-bottom: 2px;
 }

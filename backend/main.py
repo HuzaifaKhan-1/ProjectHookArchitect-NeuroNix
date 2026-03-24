@@ -3,6 +3,7 @@ from fastapi import FastAPI, UploadFile, File, BackgroundTasks, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dubbing_router import dub_router
+from database import archive_analysis, get_analysis_history
 import time
 import uuid
 import os
@@ -85,7 +86,16 @@ app.include_router(dub_router)
 
 @app.get("/")
 def read_root():
-    return {"message": "Hook Architect AI Backend is running!"}
+    return {"message": "Hook Architect AI Backend [Quantum + MongoDB] is running!"}
+
+@app.get("/history")
+async def fetch_history():
+    """ 
+    New Cloud Persistence Endpoint: 
+    Returns the most recent creator viral reports from MongoDB. 
+    """
+    history = await get_analysis_history(limit=12)
+    return {"history": history}
 
 def analyze_audio_energy(video_path: str):
     """
@@ -415,7 +425,7 @@ async def run_analysis_pipeline(file_location: str):
 
 
 @app.post("/analyze")
-async def analyze_video(file: UploadFile = File(...)):
+async def analyze_video(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
     # 1. Save the uploaded file temporarily
     file_id = uuid.uuid4().hex
     file_location = f"temp_video_{file_id}.mp4"
@@ -423,11 +433,17 @@ async def analyze_video(file: UploadFile = File(...)):
     with open(file_location, "wb") as f:
         f.write(await file.read())
         
-    return await run_analysis_pipeline(file_location)
+    result = await run_analysis_pipeline(file_location)
+    
+    # 💾 AI SELF-ARCHIVING: Save to MongoDB
+    background_tasks.add_task(archive_analysis, result)
+    
+    return result
+
 
 
 @app.post("/analyze_url")
-async def analyze_yt_url(data: dict):
+async def analyze_yt_url(background_tasks: BackgroundTasks, data: dict):
     url = data.get("url")
     if not url:
         return {"error": "No URL provided"}
@@ -457,7 +473,12 @@ async def analyze_yt_url(data: dict):
             ydl.download([url])
             
         print("✅ Download complete. Starting analysis pipeline...")
-        return await run_analysis_pipeline(file_location)
+        result = await run_analysis_pipeline(file_location)
+        
+        # 💾 AI SELF-ARCHIVING: Save YT analysis to MongoDB
+        background_tasks.add_task(archive_analysis, result)
+        
+        return result
     except Exception as e:
         print(f"❌ Error during YT processing: {e}")
         return {"error": f"YouTube download failed: {str(e)}"}

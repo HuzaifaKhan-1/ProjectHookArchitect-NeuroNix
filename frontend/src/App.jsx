@@ -732,24 +732,32 @@ function App() {
                   </div>
                 )}
                 {videoFile && !isYoutube && (
-                  <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                    <button className="primary-btn pulse-glow" style={{ width: '100%' }} onClick={handleAnalyze}>{t.analyzeBtn}</button>
+                  <div className="upload-cluster">
+                    <button className="action-btn-main" onClick={handleAnalyze}>
+                      <Activity size={20} /> {t.analyzeBtn}
+                    </button>
                     
-                    <div style={{ display: 'flex', gap: '8px', background: 'rgba(255,255,255,0.03)', padding: '15px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                      <select 
-                        value={targetDubLang} 
-                        onChange={(e) => setTargetDubLang(e.target.value)}
-                        style={{ padding: '8px 12px', borderRadius: '8px', background: '#1e293b', color: '#fff', border: '1px solid #475569', flex: 1, outline: 'none' }}
-                      >
-                        <option value="en">English (US)</option>
-                        <option value="hi">Hindi (IN)</option>
-                        <option value="mr">Marathi (IN)</option>
-                        <option value="es">Spanish (ES)</option>
-                        <option value="fr">French (FR)</option>
-                      </select>
-                      <button className="primary-btn" style={{ background: 'linear-gradient(135deg, #a855f7 0%, #ec4899 100%)', flex: 2 }} onClick={handleDubAndAnalyze}>
-                         Dub & Analyze
-                      </button>
+                    <div className="feature-island">
+                      <span className="label-micro">AI DUB ENGINE</span>
+                      <div className="dub-control-row">
+                        <div className="glass-select-wrapper">
+                          <Globe size={16} color="var(--accent-primary)" />
+                          <select 
+                            className="glass-select"
+                            value={targetDubLang} 
+                            onChange={(e) => setTargetDubLang(e.target.value)}
+                          >
+                            <option value="en">English (US)</option>
+                            <option value="hi">Hindi (IN)</option>
+                            <option value="mr">Marathi (IN)</option>
+                            <option value="es">Spanish (ES)</option>
+                            <option value="fr">French (FR)</option>
+                          </select>
+                        </div>
+                        <button className="action-btn-special" onClick={handleDubAndAnalyze}>
+                          <Zap size={18} /> Dub & Analyze
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )}
